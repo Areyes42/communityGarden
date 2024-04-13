@@ -4,6 +4,24 @@ from database import authenticate, register_user
 # from database import authenticate
 
 app = Flask(__name__)
+def create_app(test_config=None):
+    app = Flask(__name__)
+    app.config.from_mapping(
+        SECRET_KEY='dev',
+        DATABASE_NAME='community_garden',  # Use different database for testing
+    )
+
+    if test_config:
+        app.config.update(test_config)
+
+    JWTManager(app)
+
+    # Define your routes here
+    @app.route('/')
+    def index():
+        return "Hello World"
+
+    return app
 # JWT = JWTManager(app, authenticate)
 
 @app.route('/<path:filename>')
@@ -35,8 +53,7 @@ def login():
 def register():
     username = request.json.get("username", None)
     password = request.json.get("password", None)
-    database.register_user(username, password)
-    return app.send_static_file('register.html')
+    return register_user(username, password)
 
 # shows the garden of other users!
 @app.route('/garden')

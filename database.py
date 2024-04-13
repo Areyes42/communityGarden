@@ -35,19 +35,21 @@ def identity(payload):
     username = payload['username']
     return users.find_one({"username": username})
 
-def register_user(username : str, password : str):
+def register_user(username: str, password: str):
+    print(f"GOT USER! {username}, {password}")
     if users.find_one({"username": username}) is not None:
-        print("Cound not add user! Already exists")
-        return
-    password = hash_password(password)
-    to_add = convert_user_to_document()
+        return jsonify({"msg": "Couldn't add user! Already exists"}), 401
+    hashed_password = hash_password(password)
+    to_add = convert_user_to_document(username, hashed_password)
     users.insert_one(to_add)
+    return jsonify({"msg": "Successfully added user!"}), 200
+    
     
         
-def convert_user_to_document(user: User):
-        doc = {"username" : f"{user.username}",
-                "password": f"{user.password}", 
-                "plantid": f"{user.plant_id}",
+def convert_user_to_document(username, password):
+        doc = {"username" : f"{username}",
+                "password": f"{password}", 
+                "plantid": f"{plant_id}",
                 "task_ids" : ["","","","",""]}
         return doc
         
@@ -81,7 +83,7 @@ def main():
     test_user = User("delster1", "password")
     print(authenticate("delster1", "password"))
     
-main()
+# main()
 
     
     
