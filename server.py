@@ -1,14 +1,14 @@
 from flask import Flask
-from flask_jwt_extended import JWTManager, jwt_required
+from flask_jwt_extended import JWTManager, jwt_required, get_jwt_identity
+# from database import authenticate
 
 app = Flask(__name__)
-JWT = JWTManager(app)
+# JWT = JWTManager(app, authenticate)
 
 @app.route('/<path:filename>')
 def send_file(filename):
     return app.send_static_file(filename)
 
-# Define the root endpoint
 # should be the plant homepage
 @app.route('/')
 @jwt_required()
@@ -40,12 +40,14 @@ def garden():
 @app.route('/add', methods=['POST'])
 @jwt_required()
 def add_task():
+    current_user = get_jwt_identity()
     return app.send_static_file('index.html')
 
 # Delete task endpoint for user to remove task from their personal checklist
-@app.route('/<username>/delete', methods=['POST'])
+@app.route('/delete', methods=['POST'])
 @jwt_required()
 def delete_task():
+    current_user = get_jwt_identity()
     return app.send_static_file('index.html')
 
 # Grow user's plant
