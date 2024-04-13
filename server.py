@@ -1,6 +1,8 @@
 from flask import Flask
+from flask_jwt import JWT, jwt_required, current_identity
 
 app = Flask(__name__)
+JWT = JWT(app)
 
 @app.route('/<path:filename>')
 def send_file(filename):
@@ -9,6 +11,7 @@ def send_file(filename):
 # Define the root endpoint
 # should be the plant homepage
 @app.route('/')
+@jwt_required()
 def index():
     # return index.html from static folder
     return app.send_static_file('index.html')
@@ -33,43 +36,33 @@ def register():
 def garden():
     return app.send_static_file('garden.html')
 
-# get garden from db to send to garden page
-@app.route('/get_garden', methods=['GET'])
-def get_garden():
-    return app.send_static_file('index.html')
-
 # Add task endpoint for user to add task to their personal checklist
 @app.route('/add', methods=['POST'])
+@jwt_required()
 def add_task():
     return app.send_static_file('index.html')
 
 # Delete task endpoint for user to remove task from their personal checklist
-@app.route('/delete', methods=['POST'])
+@app.route('/<username>/delete', methods=['POST'])
+@jwt_required()
 def delete_task():
-    return app.send_static_file('index.html')
-
-# Add template to db
-@app.route('/add_template', methods=['POST'])
-def add_template():
-    return app.send_static_file('index.html')
-
-# Delete template from db
-@app.route('/delete_template', methods=['POST'])
-def delete_template():
     return app.send_static_file('index.html')
 
 # Grow user's plant
 @app.route('/grow', methods=['POST'])
+@jwt_required()
 def grow():
     return app.send_static_file('index.html')
 
 # Add water to user's plant
 @app.route('/water', methods=['POST'])
+@jwt_required()
 def water():
     return app.send_static_file('index.html')
 
 # Add sunlight to user's plant
 @app.route('/sunlight', methods=['POST'])
+@jwt_required()
 def sunlight():
     return app.send_static_file('index.html')
 
