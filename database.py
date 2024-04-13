@@ -35,12 +35,12 @@ def identity(payload):
     username = payload['username']
     return users.find_one({"username": username})
 
-def register_user(new_user : User):
-    if users.find_one({"username": new_user.username}) is not None:
+def register_user(username : str, password : str):
+    if users.find_one({"username": username}) is not None:
         print("Cound not add user! Already exists")
         return
-    new_user.password = hash_password(new_user.password)
-    to_add = convert_user_to_document(new_user)
+    password = hash_password(password)
+    to_add = convert_user_to_document()
     users.insert_one(to_add)
     
         

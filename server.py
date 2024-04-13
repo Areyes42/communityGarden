@@ -1,6 +1,6 @@
 from flask import Flask
 from flask_jwt_extended import JWTManager, jwt_required, get_jwt_identity
-from database import authenticate
+from database import authenticate, register_user
 # from database import authenticate
 
 app = Flask(__name__)
@@ -31,8 +31,11 @@ def login():
     return database.authenticate(username, password)
 
 # registers a user into the db
-@app.route('/register')
+@app.route('/register', methods=["POST"])
 def register():
+    username = request.json.get("username", None)
+    password = request.json.get("password", None)
+    database.register_user(username, password)
     return app.send_static_file('register.html')
 
 # shows the garden of other users!
