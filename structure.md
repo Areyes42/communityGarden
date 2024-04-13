@@ -17,6 +17,9 @@
     - Sunlight: int
     - Water: int
 
+- Garden
+    - Plants: Plant[]
+
 ## Functionality
 - User Registration
 - User Authentication
