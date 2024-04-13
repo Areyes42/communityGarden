@@ -1,8 +1,8 @@
 from flask import Flask
-from flask_jwt import JWT, jwt_required, current_identity
+from flask_jwt_extended import JWTManager, jwt_required
 
 app = Flask(__name__)
-JWT = JWT(app)
+JWT = JWTManager(app)
 
 @app.route('/<path:filename>')
 def send_file(filename):
