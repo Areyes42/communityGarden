@@ -4,10 +4,14 @@
 
 ## Server: Flask
 Non-communication functionality:
-- `generate_plant_image(Plant p)`
-- `grow_plant(Plant p)`
-- `water_plant(Plant p)`
-- `sunlight_plant(Plant p)`
+- Generate plant image
+- Grow plant
+- Water plant
+- Sunlight plant
+- Add user task (for client)
+- Delete user task
+- Add task template (for db)
+- Delete task template
 
 ## Database: MongoDB Atlas
 - Can store potentially everything!
@@ -31,13 +35,14 @@ Non-communication functionality:
 - Plant
     - Growth Stage: int
     - Sunlight: int
+        - based on daily login
     - Water: int
+        - based on good deeds
     - Image: str (url)
     - Aesthetic description
 
 - Task
     - Description: str
-    - Completed: bool
 
 ## Functionality
 - User Registration
