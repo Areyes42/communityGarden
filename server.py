@@ -1,5 +1,6 @@
 from flask import Flask
 from flask_jwt_extended import JWTManager, jwt_required, get_jwt_identity
+from database import authenticate
 # from database import authenticate
 
 app = Flask(__name__)
@@ -22,9 +23,12 @@ def templates():
     return app.send_static_file('templates.html')
 
 # login page
-@app.route('/login')
+# create_access_token() function is used to actually generate the JWT, this function is in database
+@app.route("/login", methods=["POST"])
 def login():
-    return app.send_static_file('login.html')
+    username = request.json.get("username", None)
+    password = request.json.get("password", None)
+    return database.authenticate(username, password)
 
 # registers a user into the db
 @app.route('/register')

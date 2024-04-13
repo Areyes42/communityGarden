@@ -1,7 +1,9 @@
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
 import hashlib
-
+import datetime
+from flask_jwt_extended import create_access_token
+from dtype.user import User
 from flask import Flask, request, jsonify
 
 uri = "mongodb+srv://delsterone:jVYEYXmkXofN1jH8@cluster0.xf2gegz.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
@@ -9,22 +11,48 @@ client = MongoClient(uri, server_api=ServerApi('1')) # this is what we will use 
 
 db = client['community_garden']  # Database name
 users = db['users']  # Collection name
+
+
 def hash_password(password):
         # Return the SHA-256 hash of the password
         sha_signature = hashlib.sha256(password.encode()).hexdigest()
-        return sha_signature   
+        return sha_signature     
     
-def login():
-    username = input("Enter username")
-    password = input("Enter password")
-    user = users.find_one({"username": username})
+def authenticate(username, password):
 
+    user = users.find_one({"username": username})
     if user and user['password'] == hash_password(password):
-        print("successful!")
+        # Generate a JWT token
+        access_token = create_access_token(identity=username)
+        print("successfully authenticated!")
+        return jsonify(access_token=access_token)
     else:
-        print("unsuccessful")
+        print("failure to authenticate!")
+        
+        return jsonify({"msg": "Bad username or password"}), 401
+
+def identity(payload):
+    username = payload['username']
+    return users.find_one({"username": username})
+
+def register_user(new_user : User):
+    if users.find_one({"username": new_user.username}) is not None:
+        print("Cound not add user! Already exists")
+        return
+    new_user.password = hash_password(new_user.password)
+    to_add = convert_user_to_document(new_user)
+    users.insert_one(to_add)
     
-class User:
+        
+def convert_user_to_document(user: User):
+        doc = {"username" : f"{user.username}",
+                "password": f"{user.password}", 
+                "plantid": f"{user.plant_id}",
+                "task_ids" : ["","","","",""]}
+        return doc
+        
+        
+class MyUser:
     def __init__(self):
         
         print("initializing user")
@@ -34,12 +62,8 @@ class User:
         self.username = username
         self.password = password
 
-    def add_user_to_database(self):
-        to_add = self.write_user_to_document()
-        users.insert_one(to_add)
+    
         
-    
-    
     def write_user_to_document(self):
         return { "username" : f"{self.username}", "password": f"{self.password}"}
     
@@ -54,12 +78,9 @@ def main():
         print("Pinged your deployment. You successfully connected to MongoDB!")
     except Exception as e:
         print(e)
-    # my_user = User()
-    # print(my_user)
-    # my_user.add_user_to_database()
-    # print(users)
-    login()
-    users.drop()
+    test_user = User("delster1", "password")
+    print(authenticate("delster1", "password"))
+    
 main()
 
     
