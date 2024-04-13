@@ -18,12 +18,15 @@ Non-communication functionality:
     - Collection for Users 
 
 
-
 ## Data
+- Garden
+    - Users: User[]
+
 - User
     - Username: str
     - Password: str
     - Plant: Plant
+    - Tasks: Task[]
 
 - Plant
     - Growth Stage: int
@@ -32,8 +35,9 @@ Non-communication functionality:
     - Image: str (url)
     - Aesthetic description
 
-- Garden
-    - x: Plant[]
+- Task
+    - Description: str
+    - Completed: bool
 
 ## Functionality
 - User Registration
