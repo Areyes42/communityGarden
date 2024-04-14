@@ -62,7 +62,7 @@ def garden():
 
 @app.route('/get_garden', methods=['GET'])
 def get_garden():
-    return ','.join(generate_garden(6, 2))
+    return ','.join(generate_garden(6, 4))
 
 # Add task endpoint for user to add task to their personal checklist
 @app.route('/add', methods=['POST'])

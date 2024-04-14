@@ -1,6 +1,7 @@
-let angle = 20
+let angle = 30
 
 function setup() {
+    angleMode(DEGREES)
     // get browser window width and height
     windowWidth = window.innerWidth
     windowHeight = window.innerHeight
@@ -31,7 +32,10 @@ function drawGarden(plants, width, height) {
 
     for (let i = 0; i < plants.length; i++) {
         let plant = plants[i];
-        console.log(plant.length)
+        let button = createButton('User Page');
+        button.position(x + padX * 0.70, y + padY * 0.90);
+        button.callback = () => userPage(plant.length);
+        button.mousePressed(button.callback);
         drawPlant(plant, x + padX, y + padY, plantWidth, plantHeight);
         x += plantWidth;
         if (x >= width) {
@@ -39,6 +43,10 @@ function drawGarden(plants, width, height) {
             y += plantHeight;
         }
     }
+}
+
+function userPage(str) {
+    console.log(str)
 }
 
 function drawPlant(plant, x, y, w, h) {
@@ -50,7 +58,9 @@ function drawPlant(plant, x, y, w, h) {
     strokeWeight(2)
 
     // length of each line segment as a fn of width and height
-    let len = Math.min(w, h) / ((log(plant.length) + 1) ** 2)
+    // let len = Math.min(w, h) / ((log(plant.length) + 1) ** 2)
+    let fcount = plant.match(/F/g).length
+    let len = Math.min(w, h) / (log(fcount) + 1) ** 2
 
     push()
     
