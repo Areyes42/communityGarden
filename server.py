@@ -12,6 +12,8 @@ jwt = JWTManager(app)
 app.config['SECRET_KEY'] = "asdkjfhaskjdfhasiudfhasiudfuinyvulih324"
 app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(days=1) 
 app.config['JWT_TOKEN_LOCATION'] = ['cookies']
+app.config['JWT_ACCESS_COOKIE_NAME'] = 'access_token'
+
 @app.route('/<path:filename>')
 def send_file(filename):
     return app.send_static_file(filename)
@@ -96,25 +98,29 @@ def set_tasks():
     return app.send_static_file('index.html')
     
 @app.route('/tasks', methods=["GET", 'POST'])
-@jwt_required
-def render_tasks():
+@jwt_required()
+def tasks_site():
     if request.method == "GET":
         current_user = get_jwt_identity()
         current_tasks = get_user_tasks(current_user)
         print("TASKS: ", current_tasks)
-    
-        return render_template("tasks.html", tasks=current_tasks)
+        return render_template("tasks_site.html", tasks=current_tasks)
 @app.route('/logout', methods=['GET'])
 def logout():
     response = jsonify({'logout': True, 'msg': 'Logout successful'})
     unset_access_cookies(response)
     return response
+
 # Swap task endpoint for user to change a task from their personal checklist
 @app.route('/swap', methods=['POST'])
 @jwt_required()
-def swap_task():
-    to_swap = request.json.get("task_id")
+def swap():
+    print("Headers:", request.headers)
+    print("Cookies:", request.cookies)
     current_user = get_jwt_identity()
+    print("TO SWAP: ")
+    
+    to_swap = request.json.get("task_id")
     swap_user_task(current_user, to_swap)
     return app.send_static_file('index.html')
 
@@ -123,7 +129,8 @@ def swap_task():
 @jwt_required()
 def grow():
     current_user = get_jwt_identity()
-    update_plant(current_user, "test")
+    
+    update_plant(current_user, "")
     return app.send_static_file('index.html')
 
 # Add water to user's plant

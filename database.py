@@ -90,10 +90,17 @@ def get_user_plant(username: str):
  
 def get_user_tasks(username: str):
     user_document = users.find_one({"username": username})
-    
+    new_tasks = []
     if user_document:
-        tasks = user_document.get('tasks')   
-        return tasks
+        tasks = user_document.get('tasks')  
+        for task in tasks:
+            task = str(task)
+            task_id = task.replace('\'','').split(",")[1].split(":")[0]
+            desc = task.replace("}","").replace('\'', '').split(",")[1].split(":")[1]
+            new_tasks.append((task_id, desc))
+        return new_tasks
+        
+        
     else:
         return jsonify({"msg": "User not found."}), 404
         
@@ -171,7 +178,7 @@ def main():
         print(e)
    
         
-# main()
+main()
 
     
     
