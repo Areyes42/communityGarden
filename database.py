@@ -5,6 +5,8 @@ import datetime
 from flask_jwt_extended import create_access_token
 from dtype.user import User
 from flask import Flask, request, jsonify
+from plantgen import generate_garden
+
 
 uri = "mongodb+srv://delsterone:jVYEYXmkXofN1jH8@cluster0.xf2gegz.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
 client = MongoClient(uri, server_api=ServerApi('1')) # this is what we will use to reference the database client
@@ -35,11 +37,12 @@ def register_user(username: str, password: str):
     print(f"GOT USER! {username}, {password}")
     if users.find_one({"username": username}) is not None:
         return jsonify({"msg": "Couldn't add user! Already exists"}), 401
+    plant = generate_garden(1,1)[0]
     hashed_password = hash_password(password)
-    to_add = convert_user_to_document(username, hashed_password)
+    to_add = convert_user_to_document(username, hashed_password, plant)
     users.insert_one(to_add)
     return jsonify({"msg": "Successfully added user!"}), 200
-    
+
 def update_plant(username : str, plant_id : str):
     if users.find_one({"username": username}) is None:
         return jsonify({"msg": "Couldn't edit user! User doesn't exist!"}), 401
@@ -49,6 +52,7 @@ def update_plant(username : str, plant_id : str):
     )
 
     return jsonify({"msg": "Successfully updated plant id!"}), 200
+
 def get_random_task():
     pipeline = [
         {"$sample": {"size": 1}}  # Randomly select 1 document
@@ -58,6 +62,7 @@ def get_random_task():
         return result[0]  # Return the document
     else:
         return None  # No document found
+    
 def get_user_plant(username: str):
     # Query the database for the user by username
     user_document = users.find_one({"username": username})
@@ -65,11 +70,8 @@ def get_user_plant(username: str):
     # If the user is found, retrieve their plant data
     if user_document:
         plant_data = user_document.get('plant_data')
-        if plant_data:
-            return plant_data
-        else:
-            # The user was found but there is no plant data
-            return jsonify({"msg": "No plant data found for this user."}), 404
+        print(plant_data)
+        return plant_data
     else:
         # No user was found with this username
         return jsonify({"msg": "User not found."}), 404
@@ -138,10 +140,10 @@ def swap_user_task(username: str, task_id : str):
     else:
         return jsonify({"msg": "No update was made, please check the task details."}), 400
     
-def convert_user_to_document(username, password):
+def convert_user_to_document(username, password, plant_id):
         doc = {"username" : f"{username}",
                 "password": f"{password}", 
-                "plant_id": "",
+                "plant_id": plant_id,
                 "tasks" : ["","","","",""]}
         return doc
         
@@ -149,6 +151,7 @@ def convert_user_to_document(username, password):
 def main():
 
     # Send a ping to confirm a successful connection
+    get_user_plant("testuser")
     try:
         client.admin.command('ping')
         print("Pinged your deployment. You successfully connected to MongoDB!")

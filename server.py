@@ -16,6 +16,7 @@ def send_file(filename):
 @app.route('/garden/<username>', methods=["GET"])
 def user_garden(username):
     plant = get_user_plant(username)
+    print("PLANT: ", plant)
     if len(plant) > 1: 
         return plant
     return jsonify({"message": "Retrieved Plant", "username": username, "plant": plant })
@@ -42,8 +43,7 @@ def templates():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == "GET":
-        response = redirect("login/login.html", 200)
-        return response
+        return app.send_static_file("login/login.html")
     elif request.method == "POST":
         data = request.get_json()
         username = data.get("username")
@@ -57,7 +57,7 @@ def login():
             response = jsonify({'login': True, 'msg': 'Login successful'})
             set_access_cookies(response, access_token)  # Set the JWT in an HTTPOnly cookie
             # Redirect to index with token as URL parameter (not recommended, shown for completion)
-            return response
+            return redirect(url_for('index'))
         else:
             # Return the error response if authentication fails
             return response, status_code
@@ -74,7 +74,7 @@ def register():
         password = data['password']
         register_user(username, password)
         set_new_user_tasks(username)
-        return jsonify({"message": "User registered", "username": username})
+        return redirect(url_for('index'))
 
 from database import users
 # shows the garden of other users!
@@ -93,7 +93,11 @@ def set_tasks():
     set_user_tasks(current_user)
     return app.send_static_file('index.html')
     
-    
+@app.route('/logout', methods=['GET'])
+def logout():
+    response = jsonify({'logout': True, 'msg': 'Logout successful'})
+    unset_jwt_cookies(response)
+    return response
 # Swap task endpoint for user to change a task from their personal checklist
 @app.route('/swap', methods=['POST'])
 @jwt_required()
