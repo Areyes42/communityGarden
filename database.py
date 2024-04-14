@@ -81,7 +81,7 @@ def get_user_plant(username: str):
 
     # If the user is found, retrieve their plant data
     if user_document:
-        plant_data = user_document.get('plant_data')
+        plant_data = user_document.get('plant_id')
         print(plant_data)
         return plant_data
     else:
