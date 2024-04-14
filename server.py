@@ -79,14 +79,14 @@ def register():
 # shows the garden of other users!
 @app.route('/garden')
 def garden():
-    usernames, plants = get_all_user_plants()
-    print("USERNAMES: ",usernames)
-    print("PLANTS: ", plants)
-    return render_template('garden.html', plants=plants, users=usernames)
+    return render_template('garden.html')
 
 @app.route('/get_garden', methods=['GET'])
 def get_garden():
-    return ','.join(generate_garden(8, 2))
+    usernames, plants = get_all_user_plants()
+    print("USERNAMES: ",usernames)
+    print("PLANTS: ", plants)
+    return jsonify({"usernames": usernames, "plants": plants})
 
 @app.route('/add', methods=['GET','POST'])
 @jwt_required()
