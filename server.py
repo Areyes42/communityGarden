@@ -126,20 +126,6 @@ def grow():
     update_plant(current_user, "test")
     return app.send_static_file('index.html')
 
-# Add water to user's plant
-@app.route('/water', methods=['POST'])
-@jwt_required()
-def water():
-    update_plant(current_user, "test")
-    return app.send_static_file('index.html')
-
-# Add sunlight to user's plant
-@app.route('/sunlight', methods=['POST'])
-@jwt_required()
-def sunlight():
-    update_plant(current_user, "test")
-    return app.send_static_file('index.html')
-
 @app.errorhandler(404)
 def page_not_found(e):
     print(e)
