@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{username}}'s Plant</title>
+    <style>
+      body { margin: 0; overflow: hidden; } /* Hide browser scrollbars */
+    </style>
+  </head>
+  <body>
+    <!-- Load p5 library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js"></script>
+    <!-- Load garden script -->
+    <script>
+        let angle = 30
+
+function setup() {
+    angleMode(DEGREES)
+    // get browser window width and height
+    windowWidth = window.innerWidth
+    windowHeight = window.innerHeight
+    createCanvas(windowWidth, windowHeight);
+    background(33);
+
+    // request the l-system garden from the server
+    // comma delimited list of plant strings
+    fetch('/gardenplant/{{username}}').then(response => response.json()).then(data => {
+        // parse the response
+        //plants = data.split(',');
+        //drawGarden(plants, windowWidth, windowHeight)
+        let pstr = data.plant
+        console.log(pstr)
+        drawPlant(pstr, windowWidth / 2, windowHeight, windowWidth, windowHeight)
+        textSize(min(windowWidth, windowHeight) / 20)
+        textAlign(CENTER)
+        textFont('Verdana')
+        stroke(255)
+        fill(255)
+        text("{{username}}'s Plant", windowWidth / 2, windowHeight / 20)
+    })
+}
+
+function drawPlant(plant, x, y, w, h) {
+    // draw the plant with p5.js
+    // set the stroke color to green
+    stroke(0, 255, 0)
+
+    // set the stroke weight to 2
+    strokeWeight(2)
+
+    // length of each line segment as a fn of width and height
+    // let len = Math.min(w, h) / ((log(plant.length) + 1) ** 2)
+    let fcount = plant.match(/F/g).length
+    let len = Math.min(w, h) / (log(fcount) + 1) ** 2
+
+    push()
+    
+    // translate to the grid position
+    translate(x, y)
+    for (let i = 0; i < plant.length; i++) {
+        let current = plant[i];
+
+        switch (current) {
+        case 'F':
+            line(0, 0, 0, -len);
+            translate(0, -len);
+            break;
+        case '+':
+            rotate(angle);
+            break;
+        case '-':
+            rotate(-angle);
+            break;
+        case '[':
+            push();
+            break;
+        case ']':
+            pop();
+            break;
+        default:
+            break;
+        }
+    }
+
+    pop()
+}
+
+function draw() {
+    
+}
+
+    </script>
+  </body>
+</html>

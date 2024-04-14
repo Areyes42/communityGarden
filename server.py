@@ -16,21 +16,22 @@ app.config['JWT_TOKEN_LOCATION'] = ['cookies']
 def send_file(filename):
     return app.send_static_file(filename)
 
-@app.route('/garden/<username>', methods=["GET"])
-def user_garden(username):
+@app.route('/gardenplant/<username>', methods=["GET"])
+def user_gardenplant(username):
     plant = get_user_plant(username)
     print("PLANT: ", plant)
-    if len(plant) > 1: 
-        return plant
     return jsonify({"message": "Retrieved Plant", "username": username, "plant": plant })
+
+@app.route('/garden/<username>', methods=["GET"])
+def user_garden(username):
+    return render_template('usergarden.html', username=username)
 # should be the plant homepage
 @app.route('/')
 @jwt_required()
 def index():
     current_user = get_jwt_identity()
-    plant = get_user_plant(current_user)
     tasks = get_user_tasks(current_user)
-    return render_template('index.html', username=current_user, plant=plant, tasks=tasks)
+    return render_template('index.html', username=current_user, tasks=tasks)
 
 # @app.before_request
 # def log_request_info():

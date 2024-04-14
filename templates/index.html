@@ -225,10 +225,12 @@
         let canvas = createCanvas(windowWidth, windowHeight);
         canvas.parent("plantContainer");
         // background(33);
-        let pstr = {{ plant }}
-        console.log(pstr)
+        fetch('/gardenplant/{{username}}').then(response => response.json()).then(data => {
+            let pstr = data.plant
+            console.log(pstr)
+            drawPlant(pstr, windowWidth / 2, windowHeight, windowWidth, windowHeight)
+        })
 
-        drawPlant(pstr, windowWidth / 2, windowHeight / 2, windowWidth, windowHeight)
         }
 
     function drawPlant(plant, x, y, w, h) {
