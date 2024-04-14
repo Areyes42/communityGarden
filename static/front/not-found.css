@@ -1,0 +1,68 @@
+.not-found1-container {
+  width: 100%;
+  display: flex;
+  overflow: auto;
+  min-height: 100vh;
+  align-items: flex-start;
+  flex-direction: column;
+  justify-content: center;
+}
+.not-found1-text {
+  top: 337px;
+  left: 612px;
+  position: absolute;
+}
+.not-found1-container1 {
+  top: 358px;
+  flex: 0 0 auto;
+  left: 488px;
+  width: auto;
+  height: auto;
+  display: flex;
+  position: absolute;
+  align-items: flex-start;
+  justify-content: center;
+}
+.not-found1-container2 {
+  top: 0px;
+  left: 0px;
+  display: flex;
+  position: absolute;
+  align-items: center;
+  flex-direction: column;
+  justify-content: center;
+}
+.not-found1-text1 {
+  top: -20px;
+  left: 0px;
+  color: rgb(38, 38, 38);
+  position: absolute;
+  font-size: 252px;
+  font-weight: 900;
+  letter-spacing: -20px;
+}
+.not-found1-container3 {
+  top: 663px;
+  left: 517px;
+  width: 421px;
+  display: flex;
+  position: absolute;
+  align-items: center;
+  flex-direction: column;
+  justify-content: center;
+}
+.not-found1-text2 {
+  top: 0px;
+  left: 0px;
+  position: absolute;
+  text-align: center;
+  font-weight: 400;
+}
+.not-found1-image {
+  top: 323px;
+  left: 121px;
+  width: 324px;
+  height: 354px;
+  position: absolute;
+  object-fit: cover;
+}

@@ -2,6 +2,7 @@ from flask import Flask, request
 from flask_jwt_extended import JWTManager, jwt_required, get_jwt_identity
 from database import authenticate, register_user, update_plant
 from flask import jsonify
+from plantgen import generate_garden
 # from database import authenticate
 
 app = Flask(__name__)
@@ -48,11 +49,11 @@ def register():
 # shows the garden of other users!
 @app.route('/garden')
 def garden():
-    return app.send_static_file('garden.html')
+    return app.send_static_file('garden/garden.html')
 
 @app.route('/get_garden', methods=['GET'])
 def get_garden():
-    return ','.join(generate_garden(6, 4))
+    return ','.join(generate_garden(6, 2))
 
 # Swap task endpoint for user to change a task from their personal checklist
 @app.route('/swap', methods=['POST'])

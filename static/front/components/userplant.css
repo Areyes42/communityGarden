@@ -1,0 +1,18 @@
+.userplant-container {
+  width: 535px;
+  height: 385px;
+  display: flex;
+  position: relative;
+  align-items: center;
+  flex-direction: column;
+  justify-content: center;
+}
+.userplant-image {
+  top: -16px;
+  left: 58px;
+  width: 420px;
+  height: 429px;
+  position: absolute;
+  object-fit: cover;
+}
+
