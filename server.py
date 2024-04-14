@@ -1,6 +1,6 @@
 from flask import Flask, request
 from flask_jwt_extended import JWTManager, jwt_required, get_jwt_identity
-from database import authenticate, register_user, update_plant, swap_user_task, set_new_user_tasks
+from database import authenticate, register_user, update_plant, swap_user_task, set_new_user_tasks, get_user_plant
 from flask import jsonify
 from plantgen import generate_garden
 # from database import authenticate
@@ -13,6 +13,12 @@ app.config['SECRET_KEY'] = "asdkjfhaskjdfhasiudfhasiudfuinyvulih324"
 def send_file(filename):
     return app.send_static_file(filename)
 
+@app.route('garden/<username>', methods=["GET"])
+def user_garden(username):
+    plant = get_user_plant(username)
+    if len(plant) > 1:
+        return plant
+    return jsonify({"message": "Retrieved Plant", "username": username, "plant": plant })
 # should be the plant homepage
 @app.route('/')
 # @jwt_required()
@@ -30,6 +36,8 @@ def templates():
 # create_access_token() function is used to actually generate the JWT, this function is in database
 @app.route("/login", methods=['GET',"POST"])
 def login():
+    if request.method == "GET":
+        return app.send_static_file("login/login.html")
     if request.method == "POST":
         username = request.json.get("username", None)
         password = request.json.get("password", None)
