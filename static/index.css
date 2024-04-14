@@ -177,6 +177,11 @@
   align-items: flex-start;
   flex-direction: column;
 }
+
+span {
+    color: whitesmoke;
+}
+
 .index-nav12 {
   margin-bottom: var(--dl-space-space-unit);
 }
