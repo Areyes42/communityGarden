@@ -1,6 +1,6 @@
 from flask import Flask, request, redirect, url_for, render_template
 from flask_jwt_extended import JWTManager, jwt_required, get_jwt_identity, set_access_cookies
-from database import authenticate, register_user, update_plant, swap_user_task, set_new_user_tasks, get_user_plant, get_user_tasks, get_all_usernames
+from database import authenticate, register_user, update_plant, swap_user_task, set_new_user_tasks, get_user_plant, get_user_tasks, get_all_user_plants
 from flask import jsonify
 from plantgen import generate_garden
 # from database import authenticate
@@ -76,13 +76,13 @@ def register():
         set_new_user_tasks(username)
         return redirect(url_for('index'))
 
-from database import users
 # shows the garden of other users!
 @app.route('/garden')
 def garden():
-    usernames = get_all_usernames()
+    usernames, plants = get_all_user_plants()
     print("USERNAMES: ",usernames)
-    return render_template('garden.html', users=usernames)
+    print("PLANTS: ", plants)
+    return render_template('garden.html', plants=plants, users=usernames)
 
 @app.route('/get_garden', methods=['GET'])
 def get_garden():

@@ -26,14 +26,19 @@ function setup() {
 
     // request the l-system garden from the server
     // comma delimited list of plant strings
-    fetch('/get_garden').then(response => response.text()).then(data => {
+    // fetch('/get_garden').then(response => response.text()).then(data => {
         // parse the response
-        plants = data.split(',');
-        drawGarden(plants, windowWidth, windowHeight)
-    })
+        //plants = data.split(',');
+        //drawGarden(plants, windowWidth, windowHeight)
+    //})
+    let plants = {{plants}}
+    let users = {{users}}
+    console.log("PLANTS", plants)
+    console.log("USERS", users)
+    drawGarden(plants, users, windowWidth, windowHeight) 
 }
 
-function drawGarden(plants, width, height) {
+function drawGarden(plants, users, width, height) {
     // draw each l-system plant in a dynamically-sized grid
     // bsaed on the number of plants and the window size
     let numPlants = plants.length;
@@ -48,9 +53,10 @@ function drawGarden(plants, width, height) {
 
     for (let i = 0; i < plants.length; i++) {
         let plant = plants[i];
-        let button = createButton('User Page');
+        let user = users[i];
+        let button = createButton(user);
         button.position(x + padX * 0.70, y + padY * 0.90);
-        button.callback = () => userPage(plant.length);
+        button.callback = () => userPage(user);
         button.mousePressed(button.callback);
         drawPlant(plant, x + padX, y + padY, plantWidth, plantHeight);
         x += plantWidth;
@@ -62,7 +68,8 @@ function drawGarden(plants, width, height) {
 }
 
 function userPage(str) {
-    console.log(str)
+    console.log("REDIRECTING TO USR", str)
+    window.location.href = "/garden/" + str
 }
 
 function drawPlant(plant, x, y, w, h) {

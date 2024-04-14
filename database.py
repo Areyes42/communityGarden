@@ -32,16 +32,19 @@ def authenticate(username, password):
         print("failure to authenticate!")
         
         return jsonify({"msg": "Bad username or password"}), 401
-def get_all_usernames():
+def get_all_user_plants():
     usernames = []
+    plants = []
     # Fetch all users' documents
     all_users = users.find()  # This returns a cursor to iterate over all documents
 
     for user in all_users:
         username = user.get('username')
+        plant = user.get('plant_id')
         usernames.append(username)
+        plants.append(plant)
 
-    return usernames
+    return usernames, plants
 def register_user(username: str, password: str):
     print(f"GOT USER! {username}, {password}")
     if users.find_one({"username": username}) is not None:
