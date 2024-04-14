@@ -9,16 +9,20 @@
 </head>
 <body>
     <div class="container mt-5">
-        <h2>Your Tasks</h2>
+        <h2>Your List of Good Deeds</h2>
+        <br>
+        <a href="/">Click here to go back home!</a>
         <div id="tasks-list" class="list-group">
             {% for task in tasks %}
             <div class="list-group-item d-flex justify-content-between align-items-center" id="task-{{ task[0] }}">
                 <span class="task-desc">{{ task[1] }}</span>
+                <button class="btn btn-primary btn-sm" onclick="swapTask('{{ task[0] }}')">Swap</button>
                 <button class="btn btn-success btn-sm" onclick="completeTask('{{ task[0] }}')">Complete</button>
             </div>
             {% endfor %}
         </div>
     </div>
+
 
     <script>
         function getCookie(name) {
@@ -42,11 +46,29 @@
 
             // Call the function to grow the user's plant
             growPlant();
+            swapTask(taskId)
 
             // Optionally, send an AJAX request to the server to mark the task as complete
             // and grow the plant in the backend.
         }
-
+        function swapTask(taskId) {
+            var token = getCookie('access_token');  // Assuming the JWT is stored in a cookie
+            $.ajax({
+                url: '/swap/' + '{{current_user}}',  // Check that '{{username}}' is properly replaced in the template
+                type: 'POST',
+                contentType: 'application/json',  // Explicitly setting Content-Type to 'application/json'
+                data: JSON.stringify({task_id: taskId}),
+                headers: {
+                    'Authorization': 'Bearer ' + token  // If you are using token, send it in headers
+                },
+                success: function(response) {
+                    location.reload();  // Reload page to see the changes
+                },
+                error: function(xhr) {
+                    alert('Error swapping task: ' + xhr.statusText);
+                }
+            });
+        }
         function growPlant() {
             // Implement AJAX call to server endpoint for growing plant
             $.ajax({
@@ -57,7 +79,7 @@
                     xhr.setRequestHeader("Authorization", "Bearer " + getCookie("access_token"));
                 },
                 success: function(response) {
-                    alert('Plant grown successfully!');
+                    alert('Thank you for completing a nice task! Your plant has grown...!');
                     console.log('Plant grown successfully!');
                     // Handle any additional frontend updates
                 },
@@ -66,6 +88,12 @@
                 }
             });
         }
+            function getCookie(name) {
+                var value = "; " + document.cookie;
+                var parts = value.split("; " + name + "=");
+                if (parts.length == 2) return parts.pop().split(";").shift();
+            }
+        
     </script>
 </body>
 </html>

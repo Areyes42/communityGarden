@@ -147,7 +147,7 @@ def swap_user_task(username: str, task_id : str):
         else:
             new_tasks.append(task)
     # Update the user's tasks in the database
-    print(new_tasks)
+    print("NEW TASKS: ", new_tasks)
     
     update_result = users.update_one(
         {"username": username},
@@ -178,7 +178,6 @@ def main():
         print(e)
    
         
-main()
 
     
     

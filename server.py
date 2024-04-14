@@ -113,17 +113,17 @@ def logout():
     return response
 
 # Swap task endpoint for user to change a task from their personal checklist
-@app.route('/swap', methods=['POST'])
-@jwt_required()
-def swap():
-    print("Headers:", request.headers)
-    print("Cookies:", request.cookies)
-    current_user = get_jwt_identity()
-    print("TO SWAP: ")
+# @app.route('/swap', methods=['POST'])
+# @jwt_required()
+# def swap():
+#     print("Headers:", request.headers)
+#     print("Cookies:", request.cookies)
+#     current_user = get_jwt_identity()
+#     print("TO SWAP: ")
     
-    to_swap = request.json.get("task_id")
-    swap_user_task(current_user, to_swap)
-    return app.send_static_file('index.html')
+#     to_swap = request.json.get("task_id")
+#     swap_user_task(current_user, to_swap)
+#     return app.send_static_file('index.html')
 
 # Grow user's plant
 @app.route('/grow/<username>', methods=['POST'])
@@ -132,6 +132,16 @@ def grow(username):
     new_plant = grow_plant(current_plant, 1)
     update_plant(username, new_plant)
     return app.send_static_file('index.html')
+
+@app.route('/swap/<username>/', methods=['POST'])
+def swap(username):
+    data = request.get_json()
+    task_id = data["task_id"]
+    task_id = task_id.strip()
+    print("TASK ID:", task_id)
+    response, code =  swap_user_task(username, task_id)
+    return response
+
 
 @app.errorhandler(404)
 def page_not_found(e):
