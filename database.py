@@ -11,7 +11,7 @@ client = MongoClient(uri, server_api=ServerApi('1')) # this is what we will use 
 
 db = client['community_garden']  # Database name
 users = db['users']  # Collection name
-
+tasks = db['tasks']
 
 def hash_password(password):
         # Return the SHA-256 hash of the password
@@ -25,15 +25,11 @@ def authenticate(username, password):
         # Generate a JWT token
         access_token = create_access_token(identity=username)
         print("successfully authenticated!")
-        return jsonify(access_token=access_token)
+        return jsonify(access_token=access_token), 200
     else:
         print("failure to authenticate!")
         
         return jsonify({"msg": "Bad username or password"}), 401
-
-def identity(payload):
-    username = payload['username']
-    return users.find_one({"username": username})
 
 def register_user(username: str, password: str):
     print(f"GOT USER! {username}, {password}")
@@ -44,34 +40,40 @@ def register_user(username: str, password: str):
     users.insert_one(to_add)
     return jsonify({"msg": "Successfully added user!"}), 200
     
-    
-        
+def update_plant(username : str, plant_id : str):
+    if users.find_one({"username": username}) is None:
+        return jsonify({"msg": "Couldn't edit user! User doesn't exist!"}), 401
+    users.update_one(
+        {"username": username},  # Query document to find the user
+        {"$set": {"plant_id": plant_id}}  # Update operation
+    )
+
+    return jsonify({"msg": "Successfully updated plant id!"}), 200
+def get_random_task():
+    pipeline = [
+        {"$sample": {"size": 1}}  # Randomly select 1 document
+    ]
+    result = list(tasks.aggregate(pipeline))
+    if result:
+        return result[0]  # Return the document
+    else:
+        return None  # No document found
+def swap_task(username:str, task_id: str):
+    new_task = get_random_task()
+    if users.find_one({"task_id" : task_id}) is None:
+        return jsonify({"msg": "Couldn't edit task, doesn't exist!"})
+    users.update_one(
+        {"username": username},
+        {"$set": {task_id : new_task}}
+    )
 def convert_user_to_document(username, password):
         doc = {"username" : f"{username}",
                 "password": f"{password}", 
-                "plantid": f"{plant_id}",
+                "plant_id": "",
                 "task_ids" : ["","","","",""]}
         return doc
         
         
-class MyUser:
-    def __init__(self):
-        
-        print("initializing user")
-        username = input("Enter test username to create\n")
-        password = input("Enter test password to create\n")
-        password = hash_password(password)
-        self.username = username
-        self.password = password
-
-    
-        
-    def write_user_to_document(self):
-        return { "username" : f"{self.username}", "password": f"{self.password}"}
-    
-    def __repr__(self):
-        return f"{self.username}, {self.password}"
-
 def main():
 
     # Send a ping to confirm a successful connection
