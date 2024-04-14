@@ -146,43 +146,48 @@
                 <button onclick="location.href='/register';" class="login-field-register buttonFilled button">
                     <span>Register</span>
                 </button>
+                <br>
+                <a href="/">Head here once logged in!</a>
             </div>
         </div>
     </div>
 
     <script>
-        document.getElementById('loginForm').onsubmit = function(event) {
-            event.preventDefault(); // Prevent the default form submission
-            var username = document.getElementById('username').value;
-            var password = document.getElementById('password').value;
-
-            // Using Fetch API to send the login credentials to the server
-            fetch('/login', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({username: username, password: password})
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok ' + response.statusText);
-                }
-                return response.json();
-            })
-            .then(data => {
-                console.log('Success:', data);
-                // Handle login success or failure here, e.g., redirect to the home page on success
-                if (data.access_token) {
-                    window.location.href = '/'; // Redirect to the homepage or dashboard
-                } else {
-                    alert(data.msg); // Show a failure message
-                }
-            })
-            .catch(error => {
-                console.error('Login failed:', error);
-            });
-        };
+      document.getElementById('loginForm').onsubmit = function(event) {
+        event.preventDefault(); // Prevent the default form submission
+        var username = document.getElementById('username').value;
+        var password = document.getElementById('password').value;
+    
+        // Using Fetch API to send the login credentials to the server
+        fetch('/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({username: username, password: password})
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok ' + response.statusText);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Success:', data);
+            // Handle login success or failure here
+            if (data.access_token) {
+                alert("Login successful! Redirecting..."); // Show success message
+                window.location.href = '/'; // Redirect to the homepage or dashboard
+            } else {
+                alert(data.msg); // Show a failure message if login unsuccessful
+            }
+            
+        })
+        .catch(error => {
+            console.error('Login failed:', error);
+            alert("Login attempt failed. Please check your credentials."); // Show an error alert on failure
+        });
+    };
     </script>
     <script src="https://unpkg.com/@teleporthq/teleport-custom-scripts"></script>
 </body>

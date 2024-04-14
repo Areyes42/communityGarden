@@ -35,12 +35,7 @@
                     password: password
                 })
             }).then(response => response.json()).then(data => {
-                if (data.message) {
-                    alert(data.message);
-                    if (data.message.includes("registered")) {
-                        window.location.href = "/login";
-                    }
-                }
+                alert("successful registration!")
             }).catch(error => console.error('Error:', error));
         });
     </script>
