@@ -108,36 +108,83 @@
         }
       }
     </style></head
-  ><body
-    ><link rel="stylesheet" href="./style.css" /><div
-      ><link href="./login.css" rel="stylesheet" /><div class="login-container"
-        ><div
-          id="login-field"
-          class="login-field-container login-field-root-class-name"
-          ><h1 class="login-field-text">Login</h1
-          ><span class="login-field-text1"><span>Username:</span><br /></span
-          ><input
-            type="text"
-            placeholder="placeholder"
-            class="login-field-textinput input"
-          /><span class="login-field-text4">Password:</span
-          ><img
-            alt="image"
-            src="public/login_pic-400h.png"
-            class="login-field-image"
-          /><input
-            type="text"
-            placeholder="placeholder"
-            class="login-field-textinput1 input"
-          /><span class="login-field-text5">Don't have an account?</span
-          ><button class="login-field-register buttonFilled button"
-            ><span>Register</span></button
-          ></div
-        ></div
-      ></div
-    >
-    <script
-      data-section-id="navbar"
-      src="https://unpkg.com/@teleporthq/teleport-custom-scripts"
-    ></script></body
-></html>
+  >
+  <body>
+    <div>
+        <link href="./login.css" rel="stylesheet" />
+        <div class="login-container">
+            <div id="login-field" class="login-field-container login-field-root-class-name">
+                <h1 class="login-field-text">Login</h1>
+                <form id="loginForm" action="/login" method="post">
+                    <span class="login-field-text1">
+                        <span>Username:</span><br />
+                    </span>
+                    <input
+                        type="text"
+                        id="username"
+                        name="username"
+                        placeholder="Enter username"
+                        class="login-field-textinput input"
+                        required
+                    />
+                    <span class="login-field-text4">Password:</span>
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        placeholder="Enter password"
+                        class="login-field-textinput1 input"
+                        required
+                    />
+                    <input
+                        type="submit"
+                        value="Login"
+                        class="login-field-register buttonFilled button"
+                    />
+                </form>
+                <span class="login-field-text5">Don't have an account?</span>
+                <button onclick="location.href='/register';" class="login-field-register buttonFilled button">
+                    <span>Register</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('loginForm').onsubmit = function(event) {
+            event.preventDefault(); // Prevent the default form submission
+            var username = document.getElementById('username').value;
+            var password = document.getElementById('password').value;
+
+            // Using Fetch API to send the login credentials to the server
+            fetch('/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({username: username, password: password})
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok ' + response.statusText);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Success:', data);
+                // Handle login success or failure here, e.g., redirect to the home page on success
+                if (data.access_token) {
+                    window.location.href = '/'; // Redirect to the homepage or dashboard
+                } else {
+                    alert('Login failed: ' + data.msg); // Show a failure message
+                }
+            })
+            .catch(error => {
+                console.error('Login failed:', error);
+            });
+        };
+    </script>
+    <script src="https://unpkg.com/@teleporthq/teleport-custom-scripts"></script>
+</body>
+</html>
+
