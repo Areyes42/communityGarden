@@ -35,6 +35,8 @@ def login():
         password = request.json.get("password", None)
         return authenticate(username, password)[0]
 
+    return app.send_static_file('login/login.html')
+
 # registers a user into the db
 @app.route('/register', methods=['GET',"POST"])
 def register():
@@ -50,7 +52,7 @@ def register():
 # shows the garden of other users!
 @app.route('/garden')
 def garden():
-    return app.send_static_file('garden.html')
+    return app.send_static_file('garden/garden.html')
 
 @app.route('/get_garden', methods=['GET'])
 def get_garden():
