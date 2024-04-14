@@ -2,7 +2,9 @@ import random
 
 # Define the L-system rules
 rules = {
-    'F': ['FF+[+F-F-F]-[-F+F+F]', 'F[+F]F[-F]F', 'FF-[-F+F+F]+[+F-F-F]']
+    #'F': ['FF+[+F-F-F]-[-F+F+F]', 'F[+F]F[-F]F', 'FF-[-F+F+F]+[+F-F-F]']
+    # shorter rules
+    'F': ['FF+[-F+F+F]--F', 'F[+F]F--F', 'F[-F]++F', 'F+[F+]--']
 }
 
 def generate_plant(axiom, rules, iterations):
