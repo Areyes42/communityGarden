@@ -50,6 +50,9 @@ def register():
 def garden():
     return app.send_static_file('garden.html')
 
+@app.route('/get_garden', methods=['GET'])
+def get_garden():
+    return ','.join(generate_garden(6, 4))
 
 # Swap task endpoint for user to change a task from their personal checklist
 @app.route('/swap', methods=['POST'])
