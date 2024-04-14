@@ -76,14 +76,15 @@ def register():
         set_new_user_tasks(username)
         return jsonify({"message": "User registered", "username": username})
 
+from database import users
 # shows the garden of other users!
 @app.route('/garden')
 def garden():
-    return app.send_static_file('garden/garden.html')
+    return render_template('garden.html', users=[])
 
 @app.route('/get_garden', methods=['GET'])
 def get_garden():
-    return ','.join(generate_garden(6, 4))
+    return ','.join(generate_garden(8, 2))
 
 @app.route('/add', methods=['GET','POST'])
 @jwt_required()

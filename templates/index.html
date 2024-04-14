@@ -225,8 +225,10 @@
         let canvas = createCanvas(windowWidth, windowHeight);
         canvas.parent("plantContainer");
         // background(33);
+        let pstr = {{ plant }}
+        console.log(pstr)
 
-            drawPlant({{ plant }}, windowWidth / 2, windowHeight / 2, windowWidth, windowHeight)
+            drawPlant(pstr, windowWidth / 2, windowHeight / 2, windowWidth, windowHeight)
         })
     }
 
