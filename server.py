@@ -1,6 +1,6 @@
-from flask import Flask, request
+from flask import Flask, request, url_for
 from flask_jwt_extended import JWTManager, jwt_required, get_jwt_identity
-from database import authenticate, register_user, update_plant, swap_user_task, set_new_user_tasks, get_user_plant
+from database import authenticate, register_user, update_plant, swap_user_task, set_new_user_tasks, get_user_plant, get_user_tasks
 from flask import jsonify
 from plantgen import generate_garden
 # from database import authenticate
@@ -13,19 +13,22 @@ app.config['SECRET_KEY'] = "asdkjfhaskjdfhasiudfhasiudfuinyvulih324"
 def send_file(filename):
     return app.send_static_file(filename)
 
-@app.route('garden/<username>', methods=["GET"])
+@app.route('/garden/<username>', methods=["GET"])
 def user_garden(username):
     plant = get_user_plant(username)
-    if len(plant) > 1:
+    if len(plant) > 1: # error when length of plant greater than 1
         return plant
     return jsonify({"message": "Retrieved Plant", "username": username, "plant": plant })
 # should be the plant homepage
 @app.route('/')
-# @jwt_required()
+@jwt_required()
 def index():
     print("INDEX")
+    current_user = get_jwt_identity()
+    plant = get_user_plant(current_user)
+    tasks = get_user_tasks(current_user)
     # return index.html from static folder
-    return app.send_static_file('index.html')
+    return render_template('index.html', plant=plant, tasks=tasks)
 
 # get the templates from mongodb and display them
 @app.route('/templates')
@@ -38,10 +41,15 @@ def templates():
 def login():
     if request.method == "GET":
         return app.send_static_file("login/login.html")
-    if request.method == "POST":
+    elif request.method == "POST":
         username = request.json.get("username", None)
         password = request.json.get("password", None)
-        return authenticate(username, password)[0]
+        access_token, status_code = authenticate(username, password)
+        if status_code == 200:
+            # Redirect to the home page
+            return redirect(url_for('index'))
+        else:
+            return response, status_code
 
     return app.send_static_file('login/login.html')
 
@@ -72,7 +80,6 @@ def set_tasks():
     current_user = get_jwt_identity()
     set_user_tasks(current_user)
     return app.send_static_file('index.html')
-    
     
 # Swap task endpoint for user to change a task from their personal checklist
 @app.route('/swap', methods=['POST'])
