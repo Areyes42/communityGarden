@@ -7,7 +7,7 @@
 </head>
 <body>
     <h2>Register for Community Garden</h2>
-    <form id="registrationForm" action="http://127.0.0.1:5000/register" method="post">
+    <form id="registrationForm" action="/register" method="post">
         <label for="username">Username:</label>
         <input type="text" id="username" name="username" required>
 
@@ -24,7 +24,7 @@
             var username = document.getElementById('username').value;
             var password = document.getElementById('password').value;
 
-            fetch("http://127.0.0.1:5000/register", {
+            fetch("/register", {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -37,7 +37,7 @@
                 if (data.message) {
                     alert(data.message);
                     if (data.message.includes("registered")) {
-                        window.location.href = "/login/login.html";
+                        window.location.href = "/login";
                     }
                 }
             }).catch(error => console.error('Error:', error));

@@ -42,7 +42,8 @@ def templates():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == "GET":
-        return app.send_static_file("login/login.html")
+        response = redirect("login/login.html", 200)
+        return response
     elif request.method == "POST":
         data = request.get_json()
         username = data.get("username")
