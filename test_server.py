@@ -36,7 +36,7 @@ def test_grow(access_token):
  
 def test_swap(access_token):
     url = "http://127.0.0.1:5000/swap"
-    payload = {"task_id" : "1"}
+    payload = {"task_id" : "7902699be42c8a8e46fbbb4501726517e86b22c56a189f7625a6da49081b2451"}
     headers = {
         'Content-Type': 'application/json',
         'Authorization': f'Bearer {access_token}'  # Authorization header with the JWT
@@ -75,3 +75,4 @@ if __name__ == "__main__":
     if access_token:
         test_grow(access_token)
         test_swap(access_token)
+        

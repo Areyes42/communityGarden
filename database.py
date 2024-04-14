@@ -104,7 +104,7 @@ def swap_user_task(username: str, task_id : str):
     user = users.find_one({"username": username}, {"tasks": 1})
     if user is None:
         return jsonify({"msg": "User not found!"}), 404
-
+    print(task_id)
     # Get the user's current tasks
     current_tasks = user.get('tasks', [])
     # Check if the task_id to be replaced exists in the user's tasks

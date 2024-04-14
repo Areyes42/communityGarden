@@ -1,6 +1,6 @@
 from flask import Flask, request
 from flask_jwt_extended import JWTManager, jwt_required, get_jwt_identity
-from database import authenticate, register_user, update_plant
+from database import authenticate, register_user, update_plant, swap_user_task, set_new_user_tasks
 from flask import jsonify
 from plantgen import generate_garden
 # from database import authenticate
