@@ -5,7 +5,12 @@ def test_index():
     response = requests.get(url)
     assert response.status_code == 200
     print("Index test passed")
-    
+def test_get_user_plant():
+    url = "http://127.0.0.1:5000/garden/dylan"
+    response = requests.get(url)
+    assert response.status_code == 200
+
+
 def test_login():
     url = "http://127.0.0.1:5000/login"
     payload = {"username": "testuser", "password": "testpass"}
@@ -26,7 +31,9 @@ def test_grow(access_token):
         'Content-Type': 'application/json',
         'Authorization': f'Bearer {access_token}'  # Authorization header with the JWT
     }
+    
     response = requests.post(url, headers=headers)  # Assuming GET for this example
+    
     try:
         response_data = response.json()
         print("User-specific action response:", response_data)
@@ -71,8 +78,9 @@ def test_register():
 if __name__ == "__main__":
     # test_index()
     # test_register()
+    # test_get_user_plant()
     access_token = test_login()
     if access_token:
         test_grow(access_token)
-        test_swap(access_token)
+    #     test_swap(access_token)
         
