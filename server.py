@@ -1,13 +1,16 @@
 from flask import Flask, request, redirect, url_for, render_template
-from flask_jwt_extended import JWTManager, jwt_required, get_jwt_identity, set_access_cookies
+from flask_jwt_extended import JWTManager, jwt_required, get_jwt_identity, set_access_cookies, unset_access_cookies
 from database import authenticate, register_user, update_plant, swap_user_task, set_new_user_tasks, get_user_plant, get_user_tasks, get_all_user_plants
 from flask import jsonify
 from plantgen import generate_garden
+from datetime import timedelta
+
 # from database import authenticate
 
 app = Flask(__name__)
 jwt = JWTManager(app)
 app.config['SECRET_KEY'] = "asdkjfhaskjdfhasiudfhasiudfuinyvulih324"
+app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(days=1) 
 app.config['JWT_TOKEN_LOCATION'] = ['cookies']
 @app.route('/<path:filename>')
 def send_file(filename):
@@ -29,10 +32,10 @@ def index():
     tasks = get_user_tasks(current_user)
     return render_template('index.html', username=current_user, plant=plant, tasks=tasks)
 
-@app.before_request
-def log_request_info():
-    app.logger.debug('Headers: %s', request.headers)
-    app.logger.debug('Cookies: %s', request.cookies)
+# @app.before_request
+# def log_request_info():
+#     app.logger.debug('Headers: %s', request.headers)
+#     app.logger.debug('Cookies: %s', request.cookies)
 # get the templates from mongodb and display them
 @app.route('/templates')
 def templates():
@@ -49,17 +52,14 @@ def login():
         username = data.get("username")
         password = data.get("password")
         response, status_code = authenticate(username, password)
-
         if status_code == 200:
             # Extract the token from the JSON response
             access_token = response.get_json()['access_token']
-            print("Access Token:", access_token)
             response = jsonify({'login': True, 'msg': 'Login successful'})
-            set_access_cookies(response, access_token)  # Set the JWT in an HTTPOnly cookie
-            # Redirect to index with token as URL parameter (not recommended, shown for completion)
-            return redirect(url_for('index'))
+            # Set the JWT in an HTTPOnly cookie securely
+            set_access_cookies(response, access_token)
+            return response
         else:
-            # Return the error response if authentication fails
             return response, status_code
 
 # registers a user into the db
@@ -98,15 +98,16 @@ def set_tasks():
 @app.route('/tasks', methods=["GET", 'POST'])
 @jwt_required
 def render_tasks():
-    current_user = get_jwt_identity()
-    current_tasks = get_user_tasks(current_user)
-    print(current_tasks)
+    if request.method == "GET":
+        current_user = get_jwt_identity()
+        current_tasks = get_user_tasks(current_user)
+        print("TASKS: ", current_tasks)
     
-    return render_template("tasks.html", tasks=current_tasks)
+        return render_template("tasks.html", tasks=current_tasks)
 @app.route('/logout', methods=['GET'])
 def logout():
     response = jsonify({'logout': True, 'msg': 'Logout successful'})
-    unset_jwt_cookies(response)
+    unset_access_cookies(response)
     return response
 # Swap task endpoint for user to change a task from their personal checklist
 @app.route('/swap', methods=['POST'])
@@ -138,8 +139,6 @@ def water():
 def sunlight():
     update_plant(current_user, "test")
     return app.send_static_file('index.html')
-
-
 
 @app.errorhandler(404)
 def page_not_found(e):
