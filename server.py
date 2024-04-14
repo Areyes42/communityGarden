@@ -82,7 +82,7 @@ def garden():
     usernames, plants = get_all_user_plants()
     print("USERNAMES: ",usernames)
     print("PLANTS: ", plants)
-    return render_template('garden.html', users=usernames)
+    return render_template('garden.html', plants=plants, users=usernames)
 
 @app.route('/get_garden', methods=['GET'])
 def get_garden():
