@@ -1,5 +1,5 @@
-from flask import Flask, request, url_for
-from flask_jwt_extended import JWTManager, jwt_required, get_jwt_identity
+from flask import Flask, request, redirect, url_for, render_template
+from flask_jwt_extended import JWTManager, jwt_required, get_jwt_identity, set_access_cookies
 from database import authenticate, register_user, update_plant, swap_user_task, set_new_user_tasks, get_user_plant, get_user_tasks
 from flask import jsonify
 from plantgen import generate_garden
@@ -8,7 +8,7 @@ from plantgen import generate_garden
 app = Flask(__name__)
 jwt = JWTManager(app)
 app.config['SECRET_KEY'] = "asdkjfhaskjdfhasiudfhasiudfuinyvulih324"
-
+app.config['JWT_TOKEN_LOCATION'] = ['cookies']
 @app.route('/<path:filename>')
 def send_file(filename):
     return app.send_static_file(filename)
@@ -16,20 +16,22 @@ def send_file(filename):
 @app.route('/garden/<username>', methods=["GET"])
 def user_garden(username):
     plant = get_user_plant(username)
-    if len(plant) > 1: # error when length of plant greater than 1
+    if len(plant) > 1: 
         return plant
     return jsonify({"message": "Retrieved Plant", "username": username, "plant": plant })
 # should be the plant homepage
 @app.route('/')
 @jwt_required()
 def index():
-    print("INDEX")
     current_user = get_jwt_identity()
     plant = get_user_plant(current_user)
     tasks = get_user_tasks(current_user)
-    # return index.html from static folder
-    return render_template('index.html', plant=plant, tasks=tasks)
+    return render_template('index.html', username=current_user, plant=plant, tasks=tasks)
 
+@app.before_request
+def log_request_info():
+    app.logger.debug('Headers: %s', request.headers)
+    app.logger.debug('Cookies: %s', request.cookies)
 # get the templates from mongodb and display them
 @app.route('/templates')
 def templates():
@@ -37,25 +39,33 @@ def templates():
 
 # login page
 # create_access_token() function is used to actually generate the JWT, this function is in database
-@app.route("/login", methods=['GET',"POST"])
+@app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == "GET":
         return app.send_static_file("login/login.html")
     elif request.method == "POST":
-        username = request.json.get("username", None)
-        password = request.json.get("password", None)
-        access_token, status_code = authenticate(username, password)
-        if status_code == 200:
-            # Redirect to the home page
-            return redirect(url_for('index'))
-        else:
-            return response, status_code
+        data = request.get_json()
+        username = data.get("username")
+        password = data.get("password")
+        response, status_code = authenticate(username, password)
 
-    return app.send_static_file('login/login.html')
+        if status_code == 200:
+            # Extract the token from the JSON response
+            access_token = response.get_json()['access_token']
+            print("Access Token:", access_token)
+            response = jsonify({'login': True, 'msg': 'Login successful'})
+            set_access_cookies(response, access_token)  # Set the JWT in an HTTPOnly cookie
+            # Redirect to index with token as URL parameter (not recommended, shown for completion)
+            return response
+        else:
+            # Return the error response if authentication fails
+            return response, status_code
 
 # registers a user into the db
 @app.route('/register', methods=['GET',"POST"])
 def register():
+    if request.method == "GET":
+        return app.send_static_file("register/register.html")
     if request.method == "POST":
         print("REGISTER called")
         data = request.get_json()
@@ -74,12 +84,13 @@ def garden():
 def get_garden():
     return ','.join(generate_garden(6, 4))
 
-@app.route('/add', methods=['POST'])
+@app.route('/add', methods=['GET','POST'])
 @jwt_required()
 def set_tasks():
     current_user = get_jwt_identity()
     set_user_tasks(current_user)
     return app.send_static_file('index.html')
+    
     
 # Swap task endpoint for user to change a task from their personal checklist
 @app.route('/swap', methods=['POST'])
