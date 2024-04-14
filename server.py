@@ -35,6 +35,8 @@ def login():
         password = request.json.get("password", None)
         return authenticate(username, password)[0]
 
+    return app.send_static_file('login/login.html')
+
 # registers a user into the db
 @app.route('/register', methods=['GET',"POST"])
 def register():
