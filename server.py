@@ -95,6 +95,13 @@ def sunlight():
     update_plant(current_user, "test")
     return app.send_static_file('index.html')
 
+
+
+@app.errorhandler(404)
+def page_not_found(e):
+    print(e)
+    return app.send_static_file('404/404.html')
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
 
