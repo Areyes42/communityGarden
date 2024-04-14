@@ -16,8 +16,17 @@ def generate_plant(axiom, rules, iterations):
                 new_l_system_string += random.choice(rules[character])
             else:
                 new_l_system_string += character
+
         l_system_string = new_l_system_string
+
     return l_system_string
+
+def generate_garden(size, iterations):
+    garden = []
+    for _ in range(size):
+        garden.append(generate_plant('F', rules, iterations))
+    
+    return garden
 
 # Main function
 def main():

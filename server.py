@@ -1,6 +1,7 @@
 from flask import Flask
 from flask_jwt_extended import JWTManager, jwt_required, get_jwt_identity
 from database import authenticate, register_user
+from plantgen import generate_plant, generate_garden
 # from database import authenticate
 
 app = Flask(__name__)
@@ -22,7 +23,6 @@ def create_app(test_config=None):
         return "Hello World"
 
     return app
-# JWT = JWTManager(app, authenticate)
 
 @app.route('/<path:filename>')
 def send_file(filename):
@@ -59,6 +59,10 @@ def register():
 @app.route('/garden')
 def garden():
     return app.send_static_file('garden.html')
+
+@app.route('/get_garden', methods=['GET'])
+def get_garden():
+    return ','.join(generate_garden(6, 2))
 
 # Add task endpoint for user to add task to their personal checklist
 @app.route('/add', methods=['POST'])
