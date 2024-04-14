@@ -26,16 +26,15 @@ function setup() {
 
     // request the l-system garden from the server
     // comma delimited list of plant strings
-    // fetch('/get_garden').then(response => response.text()).then(data => {
+    fetch('/get_garden').then(response => response.json()).then(data => {
         // parse the response
         //plants = data.split(',');
         //drawGarden(plants, windowWidth, windowHeight)
-    //})
-    let plants = {{plants}}
-    let users = {{users}}
-    console.log("PLANTS", plants)
-    console.log("USERS", users)
-    drawGarden(plants, users, windowWidth, windowHeight) 
+        console.log(data)
+        let users = data.usernames
+        let plants = data.plants
+        drawGarden(plants, users, windowWidth, windowHeight) 
+    })
 }
 
 function drawGarden(plants, users, width, height) {
