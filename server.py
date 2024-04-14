@@ -44,22 +44,33 @@ def register():
         username = data['username']
         password = data['password']
         register_user(username, password)
+        set_new_user_tasks(username)
         return jsonify({"message": "User registered", "username": username})
 
 # shows the garden of other users!
 @app.route('/garden')
 def garden():
-    return app.send_static_file('garden/garden.html')
+    return app.send_static_file('garden.html')
 
 @app.route('/get_garden', methods=['GET'])
 def get_garden():
-    return ','.join(generate_garden(6, 2))
+    return ','.join(generate_garden(6, 4))
 
+@app.route('/add', methods=['POST'])
+@jwt_required()
+def set_tasks():
+    current_user = get_jwt_identity()
+    set_user_tasks(current_user)
+    return app.send_static_file('index.html')
+    
+    
 # Swap task endpoint for user to change a task from their personal checklist
 @app.route('/swap', methods=['POST'])
 @jwt_required()
 def swap_task():
+    to_swap = request.json.get("task_id")
     current_user = get_jwt_identity()
+    swap_user_task(current_user, to_swap)
     return app.send_static_file('index.html')
 
 # Grow user's plant

@@ -58,19 +58,91 @@ def get_random_task():
         return result[0]  # Return the document
     else:
         return None  # No document found
-def swap_task(username:str, task_id: str):
+def get_user_plant(username: str):
+    # Query the database for the user by username
+    user_document = users.find_one({"username": username})
+
+    # If the user is found, retrieve their plant data
+    if user_document:
+        plant_data = user_document.get('plant_data')
+        if plant_data:
+            return plant_data
+        else:
+            # The user was found but there is no plant data
+            return jsonify({"msg": "No plant data found for this user."}), 404
+    else:
+        # No user was found with this username
+        return jsonify({"msg": "User not found."}), 404
+ 
+def get_user_tasks(username: str):
+    user_document = users.find_one({"username": username})
+    
+    if user_document:
+        tasks = user_document.get('tasks')   
+        return tasks
+    else:
+        return jsonify({"msg": "User not found."}), 404
+        
+def set_new_user_tasks(username: str):
+    user_document = users.find_one({"username": username})
+    if user_document:
+        new_tasks = []
+        for i in range(5):
+            task = get_random_task()
+            if task is not None:
+                new_tasks.append(task)
+        users.update_one(
+            {"username": username},  # Match the user by username
+            {"$set": {"tasks": new_tasks}}  # Set the new tasks
+        )
+        return jsonify({"msg": "Updated user tasks!"}), 200
+    return jsonify({"msg": "User not found."}), 404
+    
+        
+def swap_user_task(username: str, task_id : str):
+    print("swapping user task")
+    user = users.find_one({"username": username}, {"tasks": 1})
+    if user is None:
+        return jsonify({"msg": "User not found!"}), 404
+
+    # Get the user's current tasks
+    current_tasks = user.get('tasks', [])
+    # Check if the task_id to be replaced exists in the user's tasks
+    task_ids = [str(task.get('task_id')) for task in current_tasks]  # Convert ObjectIds to strings if necessary
+    
+    
+    # Get a new random task
     new_task = get_random_task()
-    if users.find_one({"task_id" : task_id}) is None:
-        return jsonify({"msg": "Couldn't edit task, doesn't exist!"})
-    users.update_one(
+    # If the task_id does not need to be preserved, you can omit this step.
+    # Otherwise, make sure to set the correct 'task_id' field in the new task
+    new_task['task_id'] = task_id
+    
+    # Swap out the old task for the new one
+    new_tasks = []
+    for task in current_tasks:
+        if task_id in str(task):
+            print("FOUND TASK TO EDIT")
+            new_tasks.append(new_task)
+        else:
+            new_tasks.append(task)
+    # Update the user's tasks in the database
+    print(new_tasks)
+    
+    update_result = users.update_one(
         {"username": username},
-        {"$set": {task_id : new_task}}
+        {"$set": {"tasks": new_tasks}}
     )
+    # Check if the update was successful
+    if update_result.modified_count > 0:
+        return jsonify({"msg": "Task updated successfully!"}), 200
+    else:
+        return jsonify({"msg": "No update was made, please check the task details."}), 400
+    
 def convert_user_to_document(username, password):
         doc = {"username" : f"{username}",
                 "password": f"{password}", 
                 "plant_id": "",
-                "task_ids" : ["","","","",""]}
+                "tasks" : ["","","","",""]}
         return doc
         
         
@@ -82,9 +154,8 @@ def main():
         print("Pinged your deployment. You successfully connected to MongoDB!")
     except Exception as e:
         print(e)
-    test_user = User("delster1", "password")
-    print(authenticate("delster1", "password"))
-    
+   
+        
 # main()
 
     
