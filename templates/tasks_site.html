@@ -21,6 +21,21 @@
     </div>
 
     <script>
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            console.log(cookieValue)
+            return cookieValue;
+        }
         function completeTask(taskId) {
             // Apply strikethrough style to task description
             $('#task-' + taskId + ' .task-desc').css('text-decoration', 'line-through');
@@ -35,13 +50,14 @@
         function growPlant() {
             // Implement AJAX call to server endpoint for growing plant
             $.ajax({
-                url: '/grow',
+                url: '/grow/{{current_user}}',
                 type: 'POST',
                 // Assuming you're using JWT tokens for auth
                 beforeSend: function(xhr) {
-                    xhr.setRequestHeader("Authorization", 'Bearer ' + your_access_token);
+                    xhr.setRequestHeader("Authorization", "Bearer " + getCookie("access_token"));
                 },
                 success: function(response) {
+                    alert('Plant grown successfully!');
                     console.log('Plant grown successfully!');
                     // Handle any additional frontend updates
                 },

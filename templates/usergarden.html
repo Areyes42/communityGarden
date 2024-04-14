@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>P5 Fullscreen Garden</title>
+    <title>{{username}}'s Plant</title>
     <style>
       body { margin: 0; overflow: hidden; } /* Hide browser scrollbars */
     </style>
@@ -26,49 +26,20 @@ function setup() {
 
     // request the l-system garden from the server
     // comma delimited list of plant strings
-    fetch('/get_garden').then(response => response.json()).then(data => {
+    fetch('/gardenplant/{{username}}').then(response => response.json()).then(data => {
         // parse the response
         //plants = data.split(',');
         //drawGarden(plants, windowWidth, windowHeight)
-        console.log(data)
-        let users = data.usernames
-        let plants = data.plants
-        drawGarden(plants, users, windowWidth, windowHeight) 
+        let pstr = data.plant
+        console.log(pstr)
+        drawPlant(pstr, windowWidth / 2, windowHeight, windowWidth, windowHeight)
+        textSize(min(windowWidth, windowHeight) / 20)
+        textAlign(CENTER)
+        textFont('Verdana')
+        stroke(255)
+        fill(255)
+        text("{{username}}'s Plant", windowWidth / 2, windowHeight / 20)
     })
-}
-
-function drawGarden(plants, users, width, height) {
-    // draw each l-system plant in a dynamically-sized grid
-    // bsaed on the number of plants and the window size
-    let numPlants = plants.length;
-    let numRows = Math.ceil(Math.sqrt(numPlants));
-    let numCols = Math.ceil(numPlants / numRows);
-    let plantWidth = width / numCols;
-    let plantHeight = height / numRows;
-    let x = 0;
-    let y = 0;
-    let padX = plantWidth / 2
-    let padY = plantHeight
-
-    for (let i = 0; i < plants.length; i++) {
-        let plant = plants[i];
-        let user = users[i];
-        let button = createButton(user);
-        button.position(x + padX * 0.70, y + padY * 0.90);
-        button.callback = () => userPage(user);
-        button.mousePressed(button.callback);
-        drawPlant(plant, x + padX, y + padY, plantWidth, plantHeight);
-        x += plantWidth;
-        if (x >= width) {
-            x = 0;
-            y += plantHeight;
-        }
-    }
-}
-
-function userPage(str) {
-    console.log("REDIRECTING TO USR", str)
-    window.location.href = "/garden/" + str
 }
 
 function drawPlant(plant, x, y, w, h) {
@@ -117,6 +88,7 @@ function drawPlant(plant, x, y, w, h) {
 }
 
 function draw() {
+    
 }
 
     </script>

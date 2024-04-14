@@ -175,7 +175,7 @@
               ><header
                 class="username-container buttonFlat username-root-class-name"
                 ><h1 class="username-hero-heading"
-                  ><span>{{ username}}'s' Plant</span></h1
+                  ><span>{{username}}'s Plant</span></h1
                 ></header
               ><span class="index-hero-sub-heading bodyLarge"
                 ><span
@@ -225,12 +225,13 @@
         let canvas = createCanvas(windowWidth, windowHeight);
         canvas.parent("plantContainer");
         // background(33);
-        let pstr = {{ plant }}
-        console.log(pstr)
-
-            drawPlant(pstr, windowWidth / 2, windowHeight / 2, windowWidth, windowHeight)
+        fetch('/gardenplant/{{username}}').then(response => response.json()).then(data => {
+            let pstr = data.plant
+            console.log(pstr)
+            drawPlant(pstr, windowWidth / 2, windowHeight, windowWidth, windowHeight)
         })
-    }
+
+        }
 
     function drawPlant(plant, x, y, w, h) {
         // draw the plant with p5.js

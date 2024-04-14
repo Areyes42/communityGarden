@@ -28,6 +28,9 @@ def generate_garden(size, iterations):
     
     return garden
 
+def grow_plant(current_plant, iterations):
+    return generate_plant(current_plant, rules, iterations)
+
 # Main function
 def main():
     # Parameters

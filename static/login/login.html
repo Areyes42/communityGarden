@@ -176,7 +176,7 @@
                 if (data.access_token) {
                     window.location.href = '/'; // Redirect to the homepage or dashboard
                 } else {
-                    alert('Login failed: ' + data.msg); // Show a failure message
+                    alert(data.msg); // Show a failure message
                 }
             })
             .catch(error => {

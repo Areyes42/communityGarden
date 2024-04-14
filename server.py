@@ -2,7 +2,7 @@ from flask import Flask, request, redirect, url_for, render_template
 from flask_jwt_extended import JWTManager, jwt_required, get_jwt_identity, set_access_cookies, unset_access_cookies
 from database import authenticate, register_user, update_plant, swap_user_task, set_new_user_tasks, get_user_plant, get_user_tasks, get_all_user_plants
 from flask import jsonify
-from plantgen import generate_garden
+from plantgen import generate_garden, grow_plant
 from datetime import timedelta
 
 # from database import authenticate
@@ -18,21 +18,22 @@ app.config['JWT_ACCESS_COOKIE_NAME'] = 'access_token'
 def send_file(filename):
     return app.send_static_file(filename)
 
-@app.route('/garden/<username>', methods=["GET"])
-def user_garden(username):
+@app.route('/gardenplant/<username>', methods=["GET"])
+def user_gardenplant(username):
     plant = get_user_plant(username)
     print("PLANT: ", plant)
-    if len(plant) > 1: 
-        return plant
     return jsonify({"message": "Retrieved Plant", "username": username, "plant": plant })
+
+@app.route('/garden/<username>', methods=["GET"])
+def user_garden(username):
+    return render_template('usergarden.html', username=username)
 # should be the plant homepage
 @app.route('/')
 @jwt_required()
 def index():
     current_user = get_jwt_identity()
-    plant = get_user_plant(current_user)
     tasks = get_user_tasks(current_user)
-    return render_template('index.html', username=current_user, plant=plant, tasks=tasks)
+    return render_template('index.html', username=current_user, tasks=tasks)
 
 # @app.before_request
 # def log_request_info():
@@ -76,7 +77,7 @@ def register():
         password = data['password']
         register_user(username, password)
         set_new_user_tasks(username)
-        return redirect(url_for('index'))
+        return app.send_static_file("login/login.html")
 
 # shows the garden of other users!
 @app.route('/garden')
@@ -104,7 +105,7 @@ def tasks_site():
         current_user = get_jwt_identity()
         current_tasks = get_user_tasks(current_user)
         print("TASKS: ", current_tasks)
-        return render_template("tasks_site.html", tasks=current_tasks)
+        return render_template("tasks_site.html", tasks=current_tasks, current_user = current_user)
 @app.route('/logout', methods=['GET'])
 def logout():
     response = jsonify({'logout': True, 'msg': 'Logout successful'})
@@ -125,26 +126,11 @@ def swap():
     return app.send_static_file('index.html')
 
 # Grow user's plant
-@app.route('/grow', methods=['POST'])
-@jwt_required()
-def grow():
-    current_user = get_jwt_identity()
-    
-    update_plant(current_user, "")
-    return app.send_static_file('index.html')
-
-# Add water to user's plant
-@app.route('/water', methods=['POST'])
-@jwt_required()
-def water():
-    update_plant(current_user, "test")
-    return app.send_static_file('index.html')
-
-# Add sunlight to user's plant
-@app.route('/sunlight', methods=['POST'])
-@jwt_required()
-def sunlight():
-    update_plant(current_user, "test")
+@app.route('/grow/<username>', methods=['POST'])
+def grow(username):
+    current_plant = get_user_plant(username)
+    new_plant = grow_plant(current_plant, 1)
+    update_plant(username, new_plant)
     return app.send_static_file('index.html')
 
 @app.errorhandler(404)
