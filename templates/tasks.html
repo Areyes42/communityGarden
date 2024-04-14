@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Tasks</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+</head>
+<body>
+    <div class="container mt-5">
+        <h2>Your Tasks</h2>
+        <div id="tasks-list" class="list-group">
+            {% for task in tasks %}
+            <div class="list-group-item d-flex justify-content-between align-items-center">
+                {{ task.description }}
+                <div>
+                    <button class="btn btn-primary btn-sm" onclick="swapTask('{{ task.id }}')">Swap</button>
+                    <button class="btn btn-success btn-sm" onclick="completeTask('{{ task.id }}')">Complete</button>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <script>
+        function swapTask(taskId) {
+            $.ajax({
+                url: '/swap',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({task_id: taskId}),
+                success: function(response) {
+                    location.reload();  // Reload page to see the changes
+                },
+                error: function() {
+                    alert('Error swapping task.');
+                }
+            });
+        }
+
+        function completeTask(taskId) {
+            $.ajax({
+                url: '/complete',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({task_id: taskId}),
+                success: function(response) {
+                    location.reload();  // Reload page to see the changes
+                },
+                error: function() {
+                    alert('Error completing task.');
+                }
+            });
+        }
+    </script>
+</body>
+</html>

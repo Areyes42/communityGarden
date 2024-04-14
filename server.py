@@ -95,6 +95,14 @@ def set_tasks():
     set_user_tasks(current_user)
     return app.send_static_file('index.html')
     
+@app.route('/tasks', methods=["GET", 'POST'])
+@jwt_required
+def render_tasks():
+    current_user = get_jwt_identity()
+    current_tasks = get_user_tasks(current_user)
+    print(current_tasks)
+    
+    return render_template("tasks.html", tasks=current_tasks)
 @app.route('/logout', methods=['GET'])
 def logout():
     response = jsonify({'logout': True, 'msg': 'Logout successful'})
